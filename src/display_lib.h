@@ -21,6 +21,10 @@
 #define DISPLAY_TRANSFER_MODE 1
 #define DISPLAY_SERIAL_MODE 4
 
+/* DRAWING MACROS */
+#define HORIZONTAL_LINE 100
+#define VERTICAL_LINE 101
+
 
 
 /* AVR SPECIFIC INCLUDES */
@@ -105,8 +109,14 @@ void draw_pixel(int x, int y);
 void set_foreground_color(uint8_t r, uint8_t g, uint8_t b);
 void set_background_color(uint8_t r, uint8_t g, uint8_t b);
 
+// text
 void set_font(uint8_t *font);
 void print_char(uint8_t c, int x, int y);
 void print_string(char *st, int x, int y, int deg);
+
+// drawing
+void draw_straight_line(int x, int y, int l, int type);
+void draw_empty_rectangle(int x1, int y1, int x2, int y2);
+void draw_filled_rectangle(int x1, int y1, int x2, int y2);
 
 #endif

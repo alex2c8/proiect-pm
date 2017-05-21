@@ -179,9 +179,6 @@ void _low_level_init()
 	LCD_Write_COM(0x2c);
 
 	sbi (P_CS, B_CS);
-
-	set_foreground_color(255, 255, 255);
-	set_background_color(0, 0, 0);
 }
 
 void init_lcd(uint8_t orientation)
@@ -209,6 +206,9 @@ void init_lcd(uint8_t orientation)
 	DDRB |= B_RST;
 
 	_low_level_init();
+
+	set_foreground_color(255, 255, 255);
+	set_background_color(0, 0, 0);
 }
 
 
@@ -418,5 +418,72 @@ void print_string(char *st, int x, int y, int deg)
 			print_char(*st++, x + (i * (g_font.x_size)), y);
 		// else
 		// 	rotateChar(*st++, x, y, i, deg);
+	}
+}
+
+
+
+void draw_straight_line(int x, int y, int l, int type)
+{
+	int i;
+	char ch, cl;
+
+	int limit = l;
+
+	ch = ((g_fcolor_red & 248) | g_fcolor_green >> 5);
+	cl = ((g_fcolor_green & 28) << 3 | g_fcolor_blue >> 3);
+
+	cbi(P_CS, B_CS);
+
+	if (type == HORIZONTAL_LINE) {
+		limit = l + 1;
+		setXY(x, y, x + l, y);
+	} else if (type == VERTICAL_LINE) {
+		limit = l;
+		setXY(x, y, x, y + l);
+	}
+
+	for (i = 0; i < limit; i++)
+		LCD_Write_DATA_hl(ch, cl);
+
+	sbi(P_CS, B_CS);
+	resetXY();
+}
+
+void draw_empty_rectangle(int x1, int y1, int x2, int y2)
+{
+	if (x1 > x2)
+		swap(int, x1, x2);
+
+	if (y1 > y2)
+		swap(int, y1, y2);
+
+	draw_straight_line(x1, y1, x2 - x1, HORIZONTAL_LINE);
+	draw_straight_line(x1, y2, x2 - x1, HORIZONTAL_LINE);
+	draw_straight_line(x1, y1, y2 - y1, VERTICAL_LINE);
+	draw_straight_line(x2, y1, y2 - y1, VERTICAL_LINE);
+}
+
+
+void draw_filled_rectangle(int x1, int y1, int x2, int y2)
+{
+	int i;
+
+	if (x1 > x2)
+		swap(int, x1, x2);
+
+	if (y1 > y2)
+		swap(int, y1, y2);
+
+	if (g_disp_orient == PORTRAIT) {
+		for (i = 0; i < ((y2 - y1) / 2) + 1; i++) {
+			draw_straight_line(x1, y1 + i, x2 - x1, HORIZONTAL_LINE);
+			draw_straight_line(x1, y2 - i, x2 - x1, HORIZONTAL_LINE);
+		}
+	} else {
+		for (i = 0; i < ((x2 - x1) / 2) + 1; i++) {
+			draw_straight_line(x1 + i, y1, y2 - y1, VERTICAL_LINE);
+			draw_straight_line(x2 - i, y1, y2 - y1, VERTICAL_LINE);
+		}
 	}
 }
