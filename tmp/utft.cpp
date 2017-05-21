@@ -1,4 +1,4 @@
-#include "UTFT.h"
+#include "utft.h"
 
 void UTFT::LCD_Writ_Bus(char VH,char VL, byte mode)
 {   
@@ -56,6 +56,8 @@ void UTFT::LCD_Writ_Bus(char VH,char VL, byte mode)
 	}
 }
 
+
+
 void UTFT::_set_direction_registers(byte mode)
 {
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
@@ -70,19 +72,16 @@ void UTFT::_set_direction_registers(byte mode)
 		DDRC |= 0x03;
 	}
 #endif
-
 }
 
 UTFT::UTFT()
 {
-    // model == HX8340B_S
+   	display_model = HX8340B_S;
     
-    disp_x_size=175;
-    disp_y_size=219;
-    display_transfer_mode=1;
-    display_serial_mode=SERIAL_4PIN;
-	
-	display_model = HX8340B_S;
+    disp_x_size = 175;
+    disp_y_size = 219;
+    display_transfer_mode = 1;
+    display_serial_mode = SERIAL_4PIN;
 
     // SDA is on PC1
 	P_SDA = &PORTC;
@@ -130,7 +129,7 @@ void UTFT::LCD_Write_COM_DATA(char com1,int dat1)
 
 void UTFT::InitLCD(byte orientation)
 {
-	orient=orientation;
+	orient = orientation;
 
 	sbi(P_RST, B_RST);
 	_delay_ms(5); 
@@ -220,43 +219,34 @@ void UTFT::InitLCD(byte orientation)
 
 void UTFT::setXY(word x1, word y1, word x2, word y2)
 {
-	//int tmp;
-
-	if (orient==LANDSCAPE)
+	if (orient == LANDSCAPE)
 	{
 		swap(word, x1, y1);
 		swap(word, x2, y2)
-		y1=disp_y_size-y1;
-		y2=disp_y_size-y2;
+		y1 = disp_y_size - y1;
+		y2 = disp_y_size - y2;
 		swap(word, y1, y2)
 	}
 
-	switch(display_model)
-	{
-#if !defined(DISABLE_HX8340B_S)
-	case HX8340B_S:
-		LCD_Write_COM(0x2a); 
-  		LCD_Write_DATA(x1>>8);
-  		LCD_Write_DATA(x1);
-  		LCD_Write_DATA(x2>>8);
-  		LCD_Write_DATA(x2);
-		LCD_Write_COM(0x2b); 
-  		LCD_Write_DATA(y1>>8);
-  		LCD_Write_DATA(y1);
-  		LCD_Write_DATA(y2>>8);
-  		LCD_Write_DATA(y2);
-		LCD_Write_COM(0x2c); 
-		break;
-#endif
-	}
+	LCD_Write_COM(0x2a); 
+  	LCD_Write_DATA(x1>>8);
+  	LCD_Write_DATA(x1);
+  	LCD_Write_DATA(x2>>8);
+  	LCD_Write_DATA(x2);
+	LCD_Write_COM(0x2b); 
+  	LCD_Write_DATA(y1>>8);
+  	LCD_Write_DATA(y1);
+  	LCD_Write_DATA(y2>>8);
+  	LCD_Write_DATA(y2);
+	LCD_Write_COM(0x2c); 
 }
 
 void UTFT::clrXY()
 {
-	if (orient==PORTRAIT)
-		setXY(0,0,disp_x_size,disp_y_size);
+	if (orient == PORTRAIT)
+		setXY(0, 0, disp_x_size, disp_y_size);
 	else
-		setXY(0,0,disp_y_size,disp_x_size);
+		setXY(0, 0, disp_y_size, disp_x_size);
 }
 
 void UTFT::drawRect(int x1, int y1, int x2, int y2)
@@ -490,7 +480,8 @@ void UTFT::setBackColor(byte r, byte g, byte b)
 
 void UTFT::setPixel(byte r,byte g,byte b)
 {
-	LCD_Write_DATA(((r&248)|g>>5),((g&28)<<3|b>>3));	// rrrrrggggggbbbbb
+	// rrrrr gggggg bbbbb
+	LCD_Write_DATA(((r&248)|g>>5),((g&28)<<3|b>>3));	
 }
 
 void UTFT::drawPixel(int x, int y)
@@ -637,10 +628,11 @@ void UTFT::printChar(byte c, int x, int y)
   
 	if (orient==PORTRAIT)
 	{
-		setXY(x,y,x+cfont.x_size-1,y+cfont.y_size-1);
+		setXY(x, y, x + cfont.x_size - 1, y + cfont.y_size - 1);
 	  
 		temp=((c-cfont.offset)*((cfont.x_size/8)*cfont.y_size))+4;
-		for(j=0;j<((cfont.x_size/8)*cfont.y_size);j++)
+
+		for(j = 0;j < ((cfont.x_size/8) * cfont.y_size); j++)
 		{
 			ch=pgm_read_byte(&cfont.font[temp]);
 			for(i=0;i<8;i++)
@@ -733,17 +725,17 @@ void UTFT::print(char *st, int x, int y, int deg)
 
 	if (orient==PORTRAIT)
 	{
-	if (x==RIGHT)
-		x=(disp_x_size+1)-(stl*cfont.x_size);
-	if (x==CENTER)
-		x=((disp_x_size+1)-(stl*cfont.x_size))/2;
+		if (x==RIGHT)
+			x=(disp_x_size+1)-(stl*cfont.x_size);
+		if (x==CENTER)
+			x=((disp_x_size+1)-(stl*cfont.x_size))/2;
 	}
 	else
 	{
-	if (x==RIGHT)
-		x=(disp_y_size+1)-(stl*cfont.x_size);
-	if (x==CENTER)
-		x=((disp_y_size+1)-(stl*cfont.x_size))/2;
+		if (x==RIGHT)
+			x=(disp_y_size+1)-(stl*cfont.x_size);
+		if (x==CENTER)
+			x=((disp_y_size+1)-(stl*cfont.x_size))/2;
 	}
 
 	for (i=0; i<stl; i++)
@@ -767,7 +759,7 @@ void UTFT::printNumI(long num, int x, int y, int length, char filler)
 {
 	char buf[25];
 	char st[27];
-	boolean neg=false;
+	bool neg=false;
 	int c=0, f=0;
   
 	if (num==0)
@@ -830,7 +822,7 @@ void UTFT::printNumF(double num, byte dec, int x, int y, char divider, int lengt
 {
 	char buf[25];
 	char st[27];
-	boolean neg=false;
+	bool neg=false;
 	int c=0, f=0;
 	int c2, mult;
 	unsigned long inum;
@@ -925,11 +917,11 @@ void UTFT::printNumF(double num, byte dec, int x, int y, char divider, int lengt
 
 void UTFT::setFont(uint8_t* font)
 {
-	cfont.font=font;
-	cfont.x_size=fontbyte(0);
-	cfont.y_size=fontbyte(1);
-	cfont.offset=fontbyte(2);
-	cfont.numchars=fontbyte(3);
+	cfont.font = font;
+	cfont.x_size = fontbyte(0);
+	cfont.y_size = fontbyte(1);
+	cfont.offset = fontbyte(2);
+	cfont.numchars = fontbyte(3);
 }
 
 void UTFT::drawBitmap(int x, int y, int sx, int sy, bitmapdatatype data, int scale)

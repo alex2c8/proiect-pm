@@ -1,0 +1,422 @@
+#include "display_lib.h"
+
+void LCD_Writ_Bus(char VH, char VL, uint8_t mode)
+{
+	switch (mode)
+	{
+		case 1:
+			if (VH == 1)
+				sbi(P_SDA, B_SDA);
+			else
+				cbi(P_SDA, B_SDA);
+			pulse_low(P_SCL, B_SCL);
+
+
+			if (VL & 0x80)
+				sbi(P_SDA, B_SDA);
+			else
+				cbi(P_SDA, B_SDA);
+			pulse_low(P_SCL, B_SCL);
+
+			if (VL & 0x40)
+				sbi(P_SDA, B_SDA);
+			else
+				cbi(P_SDA, B_SDA);
+			pulse_low(P_SCL, B_SCL);
+
+			if (VL & 0x20)
+				sbi(P_SDA, B_SDA);
+			else
+				cbi(P_SDA, B_SDA);
+			pulse_low(P_SCL, B_SCL);
+
+			if (VL & 0x10)
+				sbi(P_SDA, B_SDA);
+			else
+				cbi(P_SDA, B_SDA);
+			pulse_low(P_SCL, B_SCL);
+
+			if (VL & 0x08)
+				sbi(P_SDA, B_SDA);
+			else
+				cbi(P_SDA, B_SDA);
+			pulse_low(P_SCL, B_SCL);
+
+			if (VL & 0x04)
+				sbi(P_SDA, B_SDA);
+			else
+				cbi(P_SDA, B_SDA);
+			pulse_low(P_SCL, B_SCL);
+
+			if (VL & 0x02)
+				sbi(P_SDA, B_SDA);
+			else
+				cbi(P_SDA, B_SDA);
+			pulse_low(P_SCL, B_SCL);
+
+			if (VL & 0x01)
+				sbi(P_SDA, B_SDA);
+			else
+				cbi(P_SDA, B_SDA);
+			pulse_low(P_SCL, B_SCL);
+
+			break;
+	}
+}
+
+void LCD_Write_COM(char VL)
+{
+	LCD_Writ_Bus(0x00, VL, DISPLAY_TRANSFER_MODE);
+}
+
+void LCD_Write_DATA_hl(char VH,char VL)
+{
+	LCD_Writ_Bus(0x01, VH, DISPLAY_TRANSFER_MODE);
+	LCD_Writ_Bus(0x01, VL, DISPLAY_TRANSFER_MODE);
+}
+
+void LCD_Write_DATA(char VL)
+{
+	LCD_Writ_Bus(0x01 , VL, DISPLAY_TRANSFER_MODE);
+}
+
+void LCD_Write_COM_DATA(char com1, int dat1)
+{
+    LCD_Write_COM(com1);
+    LCD_Write_DATA_hl(dat1 >> 8 , dat1);
+}
+
+void _set_direction_registers(uint8_t mode)
+{
+	DDRD = 0xFF;
+	if (mode == 16) {
+		DDRB |= 0x3F;
+		DDRC |= 0x03;
+	}
+}
+
+
+
+void _low_level_init()
+{
+	sbi(P_RST, B_RST);
+	_delay_ms(5);
+	cbi(P_RST, B_RST);
+	_delay_ms(15);
+	sbi(P_RST, B_RST);
+	_delay_ms(15);
+
+	cbi(P_CS, B_CS);
+
+	LCD_Write_COM(0xC1);
+	LCD_Write_DATA(0xFF);
+	LCD_Write_DATA(0x83);
+	LCD_Write_DATA(0x40);
+	LCD_Write_COM(0x11);
+	_delay_ms(100);
+	LCD_Write_COM(0xCA);
+	LCD_Write_DATA(0x70);
+	LCD_Write_DATA(0x00);
+	LCD_Write_DATA(0xD9);
+	LCD_Write_DATA(0x01);
+	LCD_Write_DATA(0x11);
+
+	LCD_Write_COM(0xC9);
+	LCD_Write_DATA(0x90);
+	LCD_Write_DATA(0x49);
+	LCD_Write_DATA(0x10);
+	LCD_Write_DATA(0x28);
+	LCD_Write_DATA(0x28);
+	LCD_Write_DATA(0x10);
+	LCD_Write_DATA(0x00);
+	LCD_Write_DATA(0x06);
+	_delay_ms(20);
+	LCD_Write_COM(0xC2);
+	LCD_Write_DATA(0x60);
+	LCD_Write_DATA(0x71);
+	LCD_Write_DATA(0x01);
+	LCD_Write_DATA(0x0E);
+	LCD_Write_DATA(0x05);
+	LCD_Write_DATA(0x02);
+	LCD_Write_DATA(0x09);
+	LCD_Write_DATA(0x31);
+	LCD_Write_DATA(0x0A);
+
+	LCD_Write_COM(0xc3);
+	LCD_Write_DATA(0x67);
+	LCD_Write_DATA(0x30);
+	LCD_Write_DATA(0x61);
+	LCD_Write_DATA(0x17);
+	LCD_Write_DATA(0x48);
+	LCD_Write_DATA(0x07);
+	LCD_Write_DATA(0x05);
+	LCD_Write_DATA(0x33);
+	_delay_ms(10);
+	LCD_Write_COM(0xB5);
+	LCD_Write_DATA(0x35);
+	LCD_Write_DATA(0x20);
+	LCD_Write_DATA(0x45);
+
+	LCD_Write_COM(0xB4);
+	LCD_Write_DATA(0x33);
+	LCD_Write_DATA(0x25);
+	LCD_Write_DATA(0x4c);
+	_delay_ms(10);
+	LCD_Write_COM(0x3a);
+	LCD_Write_DATA(0x05);
+	LCD_Write_COM(0x29);
+	_delay_ms(10);
+	LCD_Write_COM(0x2a);
+	LCD_Write_DATA(0x00);
+	LCD_Write_DATA(0x00);
+	LCD_Write_DATA(0x00);
+	LCD_Write_DATA(0xaf);
+	LCD_Write_COM(0x2b);
+	LCD_Write_DATA(0x00);
+	LCD_Write_DATA(0x00);
+	LCD_Write_DATA(0x00);
+	LCD_Write_DATA(0xdb);
+	LCD_Write_COM(0x2c);
+
+	sbi (P_CS, B_CS);
+
+	set_foreground_color(255, 255, 255);
+	set_background_color(0, 0, 0);
+}
+
+void init_lcd(uint8_t orientation)
+{
+	g_disp_orient = orientation;
+
+	// SDA is on PC1
+	P_SDA = &PORTC;
+	B_SDA = (1 << PC1);
+	DDRC |= B_SDA;
+
+	// SCL is on PC0
+	P_SCL = &PORTC;
+	B_SCL = (1 << PC0);
+	DDRC |= B_SCL;
+
+	// CS (SS) is on PB4
+	P_CS = &PORTB;
+	B_CS = (1 << PB4);
+	DDRB |= B_CS;
+
+	// RST is on PB3
+	P_RST = &PORTB;
+	B_RST = (1 << PB3);
+	DDRB |= B_RST;
+
+	_low_level_init();
+}
+
+
+
+void setXY(word_t x1, word_t y1, word_t x2, word_t y2)
+{
+	if (g_disp_orient == LANDSCAPE)
+	{
+		swap(word_t, x1, y1);
+		swap(word_t, x2, y2)
+		y1 = DISPLAY_Y_SIZE - y1;
+		y2 = DISPLAY_Y_SIZE - y2;
+		swap(word_t, y1, y2)
+	}
+
+	LCD_Write_COM(0x2a);
+  	LCD_Write_DATA(x1>>8);
+  	LCD_Write_DATA(x1);
+  	LCD_Write_DATA(x2>>8);
+  	LCD_Write_DATA(x2);
+	LCD_Write_COM(0x2b);
+  	LCD_Write_DATA(y1>>8);
+  	LCD_Write_DATA(y1);
+  	LCD_Write_DATA(y2>>8);
+  	LCD_Write_DATA(y2);
+	LCD_Write_COM(0x2c);
+}
+
+void resetXY()
+{
+	if (g_disp_orient == PORTRAIT)
+		setXY(0, 0, DISPLAY_X_SIZE, DISPLAY_Y_SIZE);
+	else
+		setXY(0, 0, DISPLAY_Y_SIZE, DISPLAY_X_SIZE);
+}
+
+
+
+void fill_screen(uint8_t r, uint8_t g, uint8_t b)
+{
+	long i;
+	long screen_size;
+	char ch, cl;
+
+	ch = ((r & 248) | g >> 5);
+	cl = ((g & 28) << 3 | b >> 3);
+
+	cbi(P_CS, B_CS);
+	resetXY();
+
+	screen_size = (DISPLAY_X_SIZE + 1) * (DISPLAY_Y_SIZE + 1);
+
+	for (i = 0; i < screen_size; i++) {
+		LCD_Writ_Bus(1, ch, DISPLAY_TRANSFER_MODE);
+		LCD_Writ_Bus(1, cl, DISPLAY_TRANSFER_MODE);
+	}
+
+	sbi(P_CS, B_CS);
+}
+
+void clear_screen()
+{
+	long i;
+	long screen_size;
+
+	cbi(P_CS, B_CS);
+	resetXY();
+
+	screen_size = (DISPLAY_X_SIZE + 1) * (DISPLAY_Y_SIZE + 1);
+
+	for (i = 0; i < screen_size; i++) {
+		LCD_Writ_Bus(1, 0, DISPLAY_TRANSFER_MODE);
+		LCD_Writ_Bus(1, 0, DISPLAY_TRANSFER_MODE);
+	}
+
+	sbi(P_CS, B_CS);
+}
+
+
+
+void set_pixel(uint8_t r, uint8_t g, uint8_t b)
+{
+	// rrrrr gggggg bbbbb
+	LCD_Write_DATA_hl(((r & 248) | g >> 5), ((g & 28) << 3 | b >> 3));
+}
+
+void draw_pixel(int x, int y)
+{
+	cbi(P_CS, B_CS);
+
+	setXY(x, y, x, y);
+
+	set_pixel(g_fcolor_red, g_fcolor_green, g_fcolor_blue);
+
+	sbi(P_CS, B_CS);
+
+	resetXY();
+}
+
+
+void set_foreground_color(uint8_t r, uint8_t g, uint8_t b)
+{
+	g_fcolor_red = r;
+	g_fcolor_green = g;
+	g_fcolor_blue = b;
+}
+
+void set_background_color(uint8_t r, uint8_t g, uint8_t b)
+{
+	g_bcolor_red = r;
+	g_bcolor_green = g;
+	g_bcolor_blue = b;
+}
+
+
+
+void set_font(uint8_t *font)
+{
+	g_font.font = font;
+	g_font.x_size = fontbyte(0);
+	g_font.y_size = fontbyte(1);
+	g_font.offset = fontbyte(2);
+	g_font.numchars = fontbyte(3);
+}
+
+void print_char(uint8_t c, int x, int y)
+{
+	uint8_t i, ch;
+	word_t j, k;
+	word_t temp;
+
+	cbi(P_CS, B_CS);
+
+	if (g_disp_orient == PORTRAIT) {
+		setXY(x, y, x + g_font.x_size - 1, y + g_font.y_size - 1);
+
+		temp = ((c-g_font.offset) * ((g_font.x_size/8) * g_font.y_size)) + 4;
+
+		for (j = 0; j < ((g_font.x_size/8) * g_font.y_size); j++) {
+
+			ch = pgm_read_byte(&g_font.font[temp]);
+
+			for (i = 0; i < 8; i++) {
+				if ((ch & (1 << (7 - i))) != 0)
+					set_pixel(g_fcolor_red, g_fcolor_green, g_fcolor_blue);
+				else
+					set_pixel(g_bcolor_red, g_bcolor_green, g_bcolor_blue);
+			}
+
+			temp++;
+		}
+	}
+	// orientation == LANDSCAPE
+	else {
+		temp = ((c-g_font.offset) * ((g_font.x_size/8) * g_font.y_size)) + 4;
+
+		for (j = 0; j < ((g_font.x_size/8)*g_font.y_size); j += (g_font.x_size/8)) {
+
+			setXY(x, y + (j/(g_font.x_size/8)), x + g_font.x_size-1, y + (j/(g_font.x_size/8)));
+
+			for (k = (g_font.x_size/8) - 1; k >= 0; k--) {
+
+				ch = pgm_read_byte(&g_font.font[temp+k]);
+
+				for (i = 0; i < 8; i++)
+				{
+					if ((ch & (1 << i)) != 0)
+						set_pixel(g_fcolor_red, g_fcolor_green, g_fcolor_blue);
+					else
+						set_pixel(g_bcolor_red, g_bcolor_green, g_bcolor_blue);
+				}
+			}
+
+			temp += (g_font.x_size / 8);
+		}
+	}
+
+	sbi(P_CS, B_CS);
+	resetXY();
+}
+
+void print_string(char *st, int x, int y, int deg)
+{
+	int stl, i;
+
+	stl = strlen(st);
+
+	if (g_disp_orient == PORTRAIT) {
+		if (x == RIGHT)
+			x = (DISPLAY_X_SIZE + 1) - (stl * g_font.x_size);
+
+		if (x == CENTER)
+			x = ((DISPLAY_X_SIZE + 1) - (stl * g_font.x_size)) / 2;
+	}
+	// orientation == LANDSCAPE
+	else
+	{
+		if (x == RIGHT)
+			x = (DISPLAY_Y_SIZE + 1) - (stl * g_font.x_size);
+
+		if (x == CENTER)
+			x = ((DISPLAY_Y_SIZE + 1) - (stl * g_font.x_size)) / 2;
+	}
+
+	for (i = 0; i < stl; i++) {
+		if (deg == 0)
+			print_char(*st++, x + (i * (g_font.x_size)), y);
+		// else
+		// 	rotateChar(*st++, x, y, i, deg);
+	}
+}

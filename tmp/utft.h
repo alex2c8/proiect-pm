@@ -1,8 +1,6 @@
 #ifndef UTFT_H
 #define UTFT_H
 
-#define F_CPU 16000000L
-
 #define LEFT 0
 #define RIGHT 9999
 #define CENTER 9998
@@ -10,32 +8,28 @@
 #define PORTRAIT 0
 #define LANDSCAPE 1
 
+// HX8340-B (Serial)
 #define HX8340B_S		7
-#define ITDB22SP		7	// HX8340-B (Serial)
+#define ITDB22SP		7	
 
 #define SERIAL_4PIN		4
 #define SERIAL_5PIN		5
 
-//#include "HW_AVR.h" 
-#include "HW_AVR_defines.h"
+// AVR specific
+#include "HW_AVR.h" 
 
 #include <avr/pgmspace.h>
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
-#include <limits.h>
 #include <util/delay.h>
 
 
+// C/C++
 #include <stdlib.h>
-#include <stdint.h>
 #include <math.h>
 #include <string.h>
 
-typedef bool boolean;
-
-typedef char byte;
-typedef int word;
 
 typedef struct _current_font
 {
@@ -77,7 +71,7 @@ class UTFT
 		int	 getDisplayYSize();
 		
 
-	protected:
+	//protected:
 		byte fcolorr,fcolorg,fcolorb;
 		byte bcolorr,bcolorg,bcolorb;
 		byte orient;
