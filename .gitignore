@@ -1,3 +1,7 @@
+*.o
+*.hex
+*.elf
+
 BootloadHID/
 schema_electrica/
 qtouch_example/

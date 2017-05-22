@@ -1,4 +1,4 @@
-#include "display_lib.h"
+#include "lcd.h"
 
 void LCD_Writ_Bus(char VH, char VL, uint8_t mode)
 {
