@@ -26,15 +26,8 @@
 #define VERTICAL_LINE 101
 
 
-
-/* AVR SPECIFIC INCLUDES */
-#include "hw_avr.h"
-
-#include <avr/pgmspace.h>
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
-#include <util/delay.h>
+/* AVR SPECIFIC HEADER */
+#include "avr_specific.h"
 
 
 /* C INCLUDES */

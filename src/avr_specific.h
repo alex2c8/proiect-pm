@@ -1,9 +1,9 @@
 /**
- * Hardware-specific macros and functions
+ * Hardware-specific macros, functions and includes
  */
 
-#ifndef HW_AVR_H_
-#define HW_AVR_H_
+#ifndef AVR_SPECIFIC_H_
+#define AVR_SPECIFIC_H_
 
 // 16 MHz
 #define F_CPU 16000000L
@@ -25,5 +25,13 @@
 #define regtype volatile uint8_t
 #define regsize uint8_t
 #define bitmapdatatype unsigned int*
+
+
+/* AVR SPECIFIC INCLUDES */
+#include <avr/pgmspace.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+#include <util/delay.h>
 
 #endif

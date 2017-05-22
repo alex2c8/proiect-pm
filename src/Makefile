@@ -8,4 +8,4 @@ main.elf: main.c display_lib.c
 	avr-gcc -mmcu=atmega324a -Os -Wall -o $@ $^
 
 clean:
-	rm -rf *.hex *.elf
+	rm -rf main.hex main.elf
