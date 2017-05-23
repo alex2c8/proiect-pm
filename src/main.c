@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include "mpu6050/mpu6050.h"
 
 
 int _x1 = 100;
@@ -16,63 +16,73 @@ int _y2 = 85;
 int offset = 5;
 
 char buf[100];
+#define LIMIT 0.2
 
+void acc_test()
+{
+	double x = 0;
+	double y = 0;
+	double z = 0;
+	double gxds = 0;
+	double gyds = 0;
+	double gzds = 0;
+
+	mpu6050_getConvData(&x, &y, &z, &gxds, &gyds, &gzds);
+	// UP
+	if(x > LIMIT) {
+		PORTD |= (1 << PD7);
+		print_string("UP", 50, 50, 0);
+		_delay_ms(10);
+	}
+	// DOWN
+	else if(x < -LIMIT) {
+		PORTD &= ~(1 << PD7);
+		print_string("DOWN", 50, 50, 0);
+		_delay_ms(10);
+	}
+
+
+	// LEFT
+	if(y > LIMIT) {
+		PORTD |= (1 << PD7);
+		print_string("LEFT", 50, 70, 0);
+		_delay_ms(10);
+	}
+	// RIGHT
+	else if(y < -LIMIT) {
+		PORTD &= ~(1 << PD7);
+		print_string("RIGHT", 50, 70, 0);
+		_delay_ms(10);
+	}
+}
 
 int main(void)
 {
 
-	DDRD &= (1 << PD6);
+	DDRD &= ~(1 << PD6);
 	PORTD |= (1 << PD6);
 
 	DDRD |= (1 << PD7);
 	PORTD &= ~(1 << PD7);
 
-
 	init_lcd(LANDSCAPE);
 
-	// init_system();
-	// init_timer_isr();
-	// touch_init();
+
 
 	set_font(SmallFont);
 
-	char str_score[] = "score: 1337";
-	char str_lives[] = "lives: 3";
+	char str_lives[] = "Hello, world";
 
 	fill_screen(0, 0, 0);
 	_delay_ms(50);
 
+	mpu6050_init();
+
+
 	while (1) {
-		// fill_screen(200, 0, 0);
-		// _delay_ms(50);
+		print_string(str_lives, 60, 0, 0);
 
-		// fill_screen(0, 0, 200);
-		// _delay_ms(50);
-
-		set_foreground_color(100, 0, 0);
-
-		print_string(str_score, 0, 0, 0);
-		_delay_ms(50);
-
-		print_string(str_lives, 150, 0, 0);
-		_delay_ms(50);
-
-		set_foreground_color(0, 200, 0);
-
-		if ((PIND & (1 << PD6)) == 0) {
-			PORTD |= (1 << PD7);
-
-			_x1 += offset;
-			_x2 += offset;
-
-		}
-		else {
-			PORTD &= ~(1 << PD7);
-		}
-
-		draw_filled_rectangle(_x1, _y1, _x2, _y2);
-		_delay_ms(10);
-
+		acc_test();
 	}
 
 	return 0;

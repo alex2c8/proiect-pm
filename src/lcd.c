@@ -185,15 +185,25 @@ void init_lcd(uint8_t orientation)
 {
 	g_disp_orient = orientation;
 
-	// SDA is on PC1
-	P_SDA = &PORTC;
-	B_SDA = (1 << PC1);
-	DDRC |= B_SDA;
+	// // SDA is on PC1
+	// P_SDA = &PORTC;
+	// B_SDA = (1 << PC1);
+	// DDRC |= B_SDA;
 
-	// SCL is on PC0
-	P_SCL = &PORTC;
-	B_SCL = (1 << PC0);
-	DDRC |= B_SCL;
+	// SDA is on PB0
+	P_SDA = &PORTB;
+	B_SDA = (1 << PB0);
+	DDRB |= B_SDA;
+
+	// // SCL is on PC0
+	// P_SCL = &PORTC;
+	// B_SCL = (1 << PC0);
+	// DDRC |= B_SCL;
+
+	// SCL is on PB1
+	P_SCL = &PORTB;
+	B_SCL = (1 << PB1);
+	DDRB |= B_SCL;
 
 	// CS (SS) is on PB4
 	P_CS = &PORTB;
