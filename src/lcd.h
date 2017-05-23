@@ -25,17 +25,11 @@
 #define HORIZONTAL_LINE 100
 #define VERTICAL_LINE 101
 
-
 /* AVR SPECIFIC HEADER */
 #include "avr_specific.h"
 
-
 /* C INCLUDES */
-#include <stdlib.h>
-#include <math.h>
 #include <string.h>
-
-
 
 /* TYPE ALIASES */
 typedef unsigned char uint8_t;
@@ -95,6 +89,7 @@ void resetXY();
 
 void fill_screen(uint8_t r, uint8_t g, uint8_t b);
 void clear_screen();
+void clear_region(word_t x1, word_t y1, word_t x2, word_t y2);
 
 void set_pixel(uint8_t r, uint8_t g, uint8_t b);
 void draw_pixel(int x, int y);
@@ -111,5 +106,6 @@ void print_string(char *st, int x, int y, int deg);
 void draw_straight_line(int x, int y, int l, int type);
 void draw_empty_rectangle(int x1, int y1, int x2, int y2);
 void draw_filled_rectangle(int x1, int y1, int x2, int y2);
+void draw_empty_round_rectangle(int x1, int y1, int x2, int y2);
 
 #endif

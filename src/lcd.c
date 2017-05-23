@@ -185,20 +185,10 @@ void init_lcd(uint8_t orientation)
 {
 	g_disp_orient = orientation;
 
-	// // SDA is on PC1
-	// P_SDA = &PORTC;
-	// B_SDA = (1 << PC1);
-	// DDRC |= B_SDA;
-
 	// SDA is on PB0
 	P_SDA = &PORTB;
 	B_SDA = (1 << PB0);
 	DDRB |= B_SDA;
-
-	// // SCL is on PC0
-	// P_SCL = &PORTC;
-	// B_SCL = (1 << PC0);
-	// DDRC |= B_SCL;
 
 	// SCL is on PB1
 	P_SCL = &PORTB;
@@ -297,6 +287,18 @@ void clear_screen()
 	sbi(P_CS, B_CS);
 }
 
+void clear_region(word_t x1, word_t y1, word_t x2, word_t y2)
+{
+	uint8_t old_r = g_fcolor_red;
+	uint8_t old_g = g_fcolor_green;
+	uint8_t old_b = g_fcolor_blue;
+
+	set_foreground_color(g_bcolor_red, g_bcolor_green, g_bcolor_blue);
+
+	draw_empty_round_rectangle(x1, y1, x2, y2);
+
+	set_foreground_color(old_r, old_g, old_b);
+}
 
 
 void set_pixel(uint8_t r, uint8_t g, uint8_t b)
@@ -495,5 +497,27 @@ void draw_filled_rectangle(int x1, int y1, int x2, int y2)
 			draw_straight_line(x1 + i, y1, y2 - y1, VERTICAL_LINE);
 			draw_straight_line(x2 - i, y1, y2 - y1, VERTICAL_LINE);
 		}
+	}
+}
+
+void draw_empty_round_rectangle(int x1, int y1, int x2, int y2)
+{
+	if (x1 > x2)
+		swap(int, x1, x2);
+
+	if (y1 > y2)
+		swap(int, y1, y2);
+
+	if ((x2 - x1) > 4 && (y2 - y1) > 4)
+	{
+		draw_pixel(x1+1,y1+1);
+		draw_pixel(x2-1,y1+1);
+		draw_pixel(x1+1,y2-1);
+		draw_pixel(x2-1,y2-1);
+
+		draw_straight_line(x1+2, y1, x2-x1-4, HORIZONTAL_LINE);
+		draw_straight_line(x1+2, y2, x2-x1-4, HORIZONTAL_LINE);
+		draw_straight_line(x1, y1+2, y2-y1-4, VERTICAL_LINE);
+		draw_straight_line(x2, y1+2, y2-y1-4, VERTICAL_LINE);
 	}
 }

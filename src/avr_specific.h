@@ -5,9 +5,6 @@
 #ifndef AVR_SPECIFIC_H_
 #define AVR_SPECIFIC_H_
 
-// 16 MHz
-#define F_CPU 16000000L
-
 // clear bit
 #define cbi(reg, bitmask) *reg &= ~bitmask
 // set bit
