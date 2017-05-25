@@ -20,6 +20,8 @@ typedef enum {FALSE, TRUE} bool_t;
 #define BLACK 0,0,0
 #define WHITE 255,255,255
 
+#define GREY 110,120,120
+#define LIMEISH 0,255,120
 #define ARCADE_PURPLE 140,22,140
 #define TEAL 60,240,200
 #define LEVEL2 0,180,0

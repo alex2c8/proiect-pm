@@ -16,8 +16,8 @@
 #define SERIAL_4PIN 4
 #define SERIAL_5PIN 5
 
-#define DISPLAY_X_SIZE 175L
-#define DISPLAY_Y_SIZE 219L
+#define DISPLAY_X_SIZE 175
+#define DISPLAY_Y_SIZE 219
 #define DISPLAY_TRANSFER_MODE 1
 #define DISPLAY_SERIAL_MODE 4
 
@@ -95,6 +95,7 @@ void set_background_color(uint8_t r, uint8_t g, uint8_t b);
 
 // text
 void set_font(uint8_t *font);
+void font_cmpxchg(uint8_t *font);
 void print_char(uint8_t c, int x, int y);
 void print_string(char *st, int x, int y, int deg);
 
@@ -103,5 +104,6 @@ void draw_straight_line(int x, int y, int l, int type);
 void draw_empty_rectangle(int x1, int y1, int x2, int y2);
 void draw_filled_rectangle(int x1, int y1, int x2, int y2);
 void draw_empty_round_rectangle(int x1, int y1, int x2, int y2);
+void draw_empty_circle(int x, int y, int radius);
 
 #endif

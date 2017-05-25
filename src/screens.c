@@ -21,6 +21,7 @@ void welcome_screen()
 
 	print_string("Press BTN", 25, y + 3 * y_offset, 0);
 	print_string("to continue", 20, y + 4 * y_offset, 0);
+
 	_delay_ms(500);
 
 	// clear text
@@ -54,8 +55,13 @@ void level_splash_screen(int level)
 	set_level_bgcolor(level);
 
 	// print
+
+	set_foreground_color(ARCADE_PURPLE);
+
 	sprintf(g_buffer, "Level %d", level);
-	print_string(g_buffer, DISPLAY_Y_SIZE / 2 - 70, DISPLAY_X_SIZE / 2 , 0);
+	print_string(g_buffer, DISPLAY_Y_SIZE / 2 - 50, DISPLAY_X_SIZE / 2 , 0);
+
+	set_foreground_color(WHITE);
 
 	_delay_ms(SPLASH_SCREEN_DURATION);
 

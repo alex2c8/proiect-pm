@@ -259,7 +259,7 @@ void fill_screen(uint8_t r, uint8_t g, uint8_t b)
 	cbi(P_CS, B_CS);
 	resetXY();
 
-	screen_size = (DISPLAY_X_SIZE + 1) * (DISPLAY_Y_SIZE + 1);
+	screen_size = ((long)DISPLAY_X_SIZE + 1) * ((long)DISPLAY_Y_SIZE + 1);
 
 	for (i = 0; i < screen_size; i++) {
 		LCD_Writ_Bus(1, ch, DISPLAY_TRANSFER_MODE);
@@ -277,7 +277,7 @@ void clear_screen()
 	cbi(P_CS, B_CS);
 	resetXY();
 
-	screen_size = (DISPLAY_X_SIZE + 1) * (DISPLAY_Y_SIZE + 1);
+	screen_size = ((long)DISPLAY_X_SIZE + 1) * ((long)DISPLAY_Y_SIZE + 1);
 
 	for (i = 0; i < screen_size; i++) {
 		LCD_Writ_Bus(1, 0, DISPLAY_TRANSFER_MODE);
@@ -344,6 +344,14 @@ void set_font(uint8_t *font)
 	g_font.y_size = fontbyte(1);
 	g_font.offset = fontbyte(2);
 	g_font.numchars = fontbyte(3);
+}
+
+void font_cmpxchg(uint8_t *font)
+{
+	if (g_font.font == font)
+		return;
+
+	set_font(font);
 }
 
 void print_char(uint8_t c, int x, int y)
@@ -520,4 +528,56 @@ void draw_empty_round_rectangle(int x1, int y1, int x2, int y2)
 		draw_straight_line(x1, y1+2, y2-y1-4, VERTICAL_LINE);
 		draw_straight_line(x2, y1+2, y2-y1-4, VERTICAL_LINE);
 	}
+}
+
+void draw_empty_circle(int x, int y, int radius)
+{
+	int f = 1 - radius;
+	int ddF_x = 1;
+	int ddF_y = -2 * radius;
+	int x1 = 0;
+	int y1 = radius;
+	char ch, cl;
+
+	ch = ((g_fcolor_red & 248) | g_fcolor_green >> 5);
+	cl = ((g_fcolor_green & 28) << 3 | g_fcolor_blue >> 3);
+
+	cbi(P_CS, B_CS);
+	setXY(x, y + radius, x, y + radius);
+	LCD_Write_DATA_hl(ch,cl);
+	setXY(x, y - radius, x, y - radius);
+	LCD_Write_DATA_hl(ch,cl);
+	setXY(x + radius, y, x + radius, y);
+	LCD_Write_DATA_hl(ch,cl);
+	setXY(x - radius, y, x - radius, y);
+	LCD_Write_DATA_hl(ch,cl);
+
+	while(x1 < y1) {
+		if(f >= 0) {
+			y1--;
+			ddF_y += 2;
+			f += ddF_y;
+		}
+		x1++;
+		ddF_x += 2;
+		f += ddF_x;
+		setXY(x + x1, y + y1, x + x1, y + y1);
+		LCD_Write_DATA_hl(ch,cl);
+		setXY(x - x1, y + y1, x - x1, y + y1);
+		LCD_Write_DATA_hl(ch,cl);
+		setXY(x + x1, y - y1, x + x1, y - y1);
+		LCD_Write_DATA_hl(ch,cl);
+		setXY(x - x1, y - y1, x - x1, y - y1);
+		LCD_Write_DATA_hl(ch,cl);
+		setXY(x + y1, y + x1, x + y1, y + x1);
+		LCD_Write_DATA_hl(ch,cl);
+		setXY(x - y1, y + x1, x - y1, y + x1);
+		LCD_Write_DATA_hl(ch,cl);
+		setXY(x + y1, y - x1, x + y1, y - x1);
+		LCD_Write_DATA_hl(ch,cl);
+		setXY(x - y1, y - x1, x - y1, y - x1);
+		LCD_Write_DATA_hl(ch,cl);
+	}
+	sbi(P_CS, B_CS);
+	resetXY();
 }

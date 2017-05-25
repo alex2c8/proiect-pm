@@ -126,7 +126,6 @@ static void system_init(void)
 {
 	// initialize LCD
 	init_lcd(LANDSCAPE);
-	set_font(BigFont);
 
 	// enable interrupts
 	sei();
@@ -138,11 +137,44 @@ static void system_init(void)
 	mpu6050_init();
 }
 
+static void reset_colors(void)
+{
+	set_background_color(BLACK);
+	set_foreground_color(WHITE);
+
+	fill_screen(BLACK);
+}
+
+static void game_init(void)
+{
+	// init player
+	g_player.lives = 3;
+	g_player.score = 0;
+
+	// init paddle
+	g_paddle.width = 40;
+	g_paddle.height = 8;
+	g_paddle.speed = 12;
+	g_paddle.base_x = DISPLAY_Y_SIZE / 2 - g_paddle.width / 2;
+	g_paddle.base_y = DISPLAY_X_SIZE - 1 - g_paddle.height;
+
+	// init ball
+	g_ball.radius = 4;
+	g_ball.speed = 12;
+	g_ball.center_x = g_paddle.base_x + g_paddle.width / 2;
+	g_ball.center_y = g_paddle.base_y - 3 - g_ball.radius / 2;
+}
+
 int main(void)
 {
 	srand(1337);
 
 	system_init();
+
+	game_init();
+
+	// initially use the big font
+	set_font(BigFont);
 
 	for (; ;) {
 		// continuously draw welcome screen until BTN is pressed
@@ -157,6 +189,10 @@ int main(void)
 			fill_screen(TEAL);
 			level_splash_screen(1);
 		}
+
+		// transition
+		reset_colors();
+		font_cmpxchg(SmallFont);
 
 		// start level 1
 		while(game_level(1));
