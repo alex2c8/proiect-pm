@@ -1,15 +1,28 @@
+#include "common.h"
+
 // LCD
 #include "lcd.h"
-#include "font.h"
+#include "screens.h"
 
 // accelerometer
 #include "mpu6050/mpu6050.h"
 
-// C
-#include <string.h>
+// game logic
+#include "game.h"
 
+// fonts
+extern uint8_t SmallFont[1144];
+extern uint8_t BigFont[3044];
+
+
+// defines
 #define LIMIT 0.2
-#define abs(X) ((X < 0) ? (-X) : (X))
+
+
+
+// global variables
+uint8_t g_screen_bitmask = (1 << WELCOME_SCREEN);
+
 
 int width = 20;
 int height = 15;
@@ -21,8 +34,24 @@ int _y2 = DISPLAY_X_SIZE;
 
 int offset = 12;
 
+// routine for interrupt on PD6
+ISR(PCINT3_vect)
+{
+	// TODO: switch state based on bit state
+	if ((PIND & (1 << PD6)) == 0) {
 
-char buf[100];
+		// led switch (indicator)
+		PORTD ^= (1 << PD7);
+
+		// welcome screen -> level 1
+		if (isset_bit(g_screen_bitmask, WELCOME_SCREEN)) {
+			g_screen_bitmask = 0;
+			set_bit(g_screen_bitmask, LEVEL1_SCREEN);
+		}
+
+
+	}
+}
 
 
 uint8_t acc_test()
@@ -73,40 +102,72 @@ uint8_t acc_test()
 	return r;
 }
 
+static void IO_init(void)
+{
+	// set PD6 button as input
+	DDRD &= ~(1 << PD6);
+	// set pull-up
+	PORTD |= (1 << PD6);
+
+	// set PD7 led as output
+	DDRD |= (1 << PD7);
+	PORTD &= ~(1 << PD7);
+}
+
+static void interrupts_init(void)
+{
+	// activate interrupts of button PD6
+	PCICR = (1 << PCIE3);
+	PCMSK3 = (1 << PCINT30);
+}
+
+// initialize entire system
+static void system_init(void)
+{
+	// initialize LCD
+	init_lcd(LANDSCAPE);
+	set_font(BigFont);
+
+	// enable interrupts
+	sei();
+
+	IO_init();
+	interrupts_init();
+
+	// initialize accelerometer
+	mpu6050_init();
+}
+
 int main(void)
 {
+	srand(1337);
 
-	// DDRD &= ~(1 << PD6);
-	// PORTD |= (1 << PD6);
+	system_init();
 
-	// DDRD |= (1 << PD7);
-	// PORTD &= ~(1 << PD7);
-
-	init_lcd(LANDSCAPE);
-	set_font(SmallFont);
-
-	set_background_color(0, 200, 0);
-
-	fill_screen(0, 200, 0);
-	_delay_ms(50);
-
-	mpu6050_init();
-
-	while (1) {
-		//print_string(str_lives, 60, 0, 0);
-
-		int old_x1 = _x1;
-		int old_x2 = _x2;
-		int old_y1 = _y1;
-		int old_y2 = _y2;
+	for (; ;) {
+		// continuously draw welcome screen until BTN is pressed
+		fill_screen(ARCADE_PURPLE);
+		while (isset_bit(g_screen_bitmask, WELCOME_SCREEN))
+			welcome_screen();
+		_delay_ms(10);
 
 
-		if(acc_test()) {
-			clear_region(old_x1, old_y1, old_x2, old_y2);
-			// _delay_ms(25);
-			draw_empty_round_rectangle(_x1, _y1, _x2, _y2);
-			_delay_ms(25);
+		// BTN was pressed, switch to level 1
+		if (isset_bit(g_screen_bitmask, LEVEL1_SCREEN)) {
+			fill_screen(TEAL);
+			level_splash_screen(1);
 		}
+
+		// start level 1
+		while(game_level(1));
+
+
+
+
+
+		// reset
+		_delay_ms(10);
+		g_screen_bitmask = (1 << WELCOME_SCREEN);
 	}
 
 	return 0;

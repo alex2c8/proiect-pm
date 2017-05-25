@@ -1,5 +1,5 @@
-#ifndef DISPLAY_LIB_H
-#define DISPLAY_LIB_H
+#ifndef LCD_H
+#define LCD_H
 
 /* GENERAL MACROS */
 #define LEFT 0
@@ -28,12 +28,8 @@
 /* AVR SPECIFIC HEADER */
 #include "avr_specific.h"
 
-/* C INCLUDES */
-#include <string.h>
 
-/* TYPE ALIASES */
-typedef unsigned char uint8_t;
-typedef int word_t;
+#include "common.h"
 
 typedef struct {
 	uint8_t *font;
