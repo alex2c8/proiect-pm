@@ -2,66 +2,60 @@
 
 void LCD_Writ_Bus(char VH, char VL, uint8_t mode)
 {
-	switch (mode)
-	{
-		case 1:
-			if (VH == 1)
-				sbi(P_SDA, B_SDA);
-			else
-				cbi(P_SDA, B_SDA);
-			pulse_low(P_SCL, B_SCL);
+	if (VH == 1)
+		sbi(PORTB, (1 << PB0));
+	else
+		cbi(PORTB, (1 << PB0));
+	pulse_low(PORTB, (1 << PB1));
 
 
-			if (VL & 0x80)
-				sbi(P_SDA, B_SDA);
-			else
-				cbi(P_SDA, B_SDA);
-			pulse_low(P_SCL, B_SCL);
+	if (VL & 0x80)
+		sbi(PORTB, (1 << PB0));
+	else
+		cbi(PORTB, (1 << PB0));
+	pulse_low(PORTB, (1 << PB1));
 
-			if (VL & 0x40)
-				sbi(P_SDA, B_SDA);
-			else
-				cbi(P_SDA, B_SDA);
-			pulse_low(P_SCL, B_SCL);
+	if (VL & 0x40)
+		sbi(PORTB, (1 << PB0));
+	else
+		cbi(PORTB, (1 << PB0));
+	pulse_low(PORTB, (1 << PB1));
 
-			if (VL & 0x20)
-				sbi(P_SDA, B_SDA);
-			else
-				cbi(P_SDA, B_SDA);
-			pulse_low(P_SCL, B_SCL);
+	if (VL & 0x20)
+		sbi(PORTB, (1 << PB0));
+	else
+		cbi(PORTB, (1 << PB0));
+	pulse_low(PORTB, (1 << PB1));
 
-			if (VL & 0x10)
-				sbi(P_SDA, B_SDA);
-			else
-				cbi(P_SDA, B_SDA);
-			pulse_low(P_SCL, B_SCL);
+	if (VL & 0x10)
+		sbi(PORTB, (1 << PB0));
+	else
+		cbi(PORTB, (1 << PB0));
+	pulse_low(PORTB, (1 << PB1));
 
-			if (VL & 0x08)
-				sbi(P_SDA, B_SDA);
-			else
-				cbi(P_SDA, B_SDA);
-			pulse_low(P_SCL, B_SCL);
+	if (VL & 0x08)
+		sbi(PORTB, (1 << PB0));
+	else
+		cbi(PORTB, (1 << PB0));
+	pulse_low(PORTB, (1 << PB1));
 
-			if (VL & 0x04)
-				sbi(P_SDA, B_SDA);
-			else
-				cbi(P_SDA, B_SDA);
-			pulse_low(P_SCL, B_SCL);
+	if (VL & 0x04)
+		sbi(PORTB, (1 << PB0));
+	else
+		cbi(PORTB, (1 << PB0));
+	pulse_low(PORTB, (1 << PB1));
 
-			if (VL & 0x02)
-				sbi(P_SDA, B_SDA);
-			else
-				cbi(P_SDA, B_SDA);
-			pulse_low(P_SCL, B_SCL);
+	if (VL & 0x02)
+		sbi(PORTB, (1 << PB0));
+	else
+		cbi(PORTB, (1 << PB0));
+	pulse_low(PORTB, (1 << PB1));
 
-			if (VL & 0x01)
-				sbi(P_SDA, B_SDA);
-			else
-				cbi(P_SDA, B_SDA);
-			pulse_low(P_SCL, B_SCL);
-
-			break;
-	}
+	if (VL & 0x01)
+		sbi(PORTB, (1 << PB0));
+	else
+		cbi(PORTB, (1 << PB0));
+	pulse_low(PORTB, (1 << PB1));
 }
 
 void LCD_Write_COM(char VL)
@@ -99,14 +93,14 @@ void _set_direction_registers(uint8_t mode)
 
 void _low_level_init()
 {
-	sbi(P_RST, B_RST);
+	sbi(PORTB, (1 << PB3));
 	_delay_ms(5);
-	cbi(P_RST, B_RST);
+	cbi(PORTB, (1 << PB3));
 	_delay_ms(15);
-	sbi(P_RST, B_RST);
+	sbi(PORTB, (1 << PB3));
 	_delay_ms(15);
 
-	cbi(P_CS, B_CS);
+	cbi(PORTB, (1 << PB4));
 
 	LCD_Write_COM(0xC1);
 	LCD_Write_DATA(0xFF);
@@ -178,7 +172,7 @@ void _low_level_init()
 	LCD_Write_DATA(0xdb);
 	LCD_Write_COM(0x2c);
 
-	sbi (P_CS, B_CS);
+	sbi (PORTB, (1 << PB4));
 }
 
 void init_lcd(uint8_t orientation)
@@ -186,24 +180,13 @@ void init_lcd(uint8_t orientation)
 	g_disp_orient = orientation;
 
 	// SDA is on PB0
-	P_SDA = &PORTB;
-	B_SDA = (1 << PB0);
-	DDRB |= B_SDA;
-
+	DDRB |= (1 << PB0);
 	// SCL is on PB1
-	P_SCL = &PORTB;
-	B_SCL = (1 << PB1);
-	DDRB |= B_SCL;
-
+	DDRB |= (1 << PB1);
 	// CS (SS) is on PB4
-	P_CS = &PORTB;
-	B_CS = (1 << PB4);
-	DDRB |= B_CS;
-
+	DDRB |= (1 << PB4);
 	// RST is on PB3
-	P_RST = &PORTB;
-	B_RST = (1 << PB3);
-	DDRB |= B_RST;
+	DDRB |= (1 << PB3);
 
 	_low_level_init();
 
@@ -256,7 +239,7 @@ void fill_screen(uint8_t r, uint8_t g, uint8_t b)
 	ch = ((r & 248) | g >> 5);
 	cl = ((g & 28) << 3 | b >> 3);
 
-	cbi(P_CS, B_CS);
+	cbi(PORTB, (1 << PB4));
 	resetXY();
 
 	screen_size = ((long)DISPLAY_X_SIZE + 1) * ((long)DISPLAY_Y_SIZE + 1);
@@ -266,7 +249,7 @@ void fill_screen(uint8_t r, uint8_t g, uint8_t b)
 		LCD_Writ_Bus(1, cl, DISPLAY_TRANSFER_MODE);
 	}
 
-	sbi(P_CS, B_CS);
+	sbi(PORTB, (1 << PB4));
 }
 
 void clear_screen()
@@ -274,7 +257,7 @@ void clear_screen()
 	long i;
 	long screen_size;
 
-	cbi(P_CS, B_CS);
+	cbi(PORTB, (1 << PB4));
 	resetXY();
 
 	screen_size = ((long)DISPLAY_X_SIZE + 1) * ((long)DISPLAY_Y_SIZE + 1);
@@ -284,7 +267,7 @@ void clear_screen()
 		LCD_Writ_Bus(1, 0, DISPLAY_TRANSFER_MODE);
 	}
 
-	sbi(P_CS, B_CS);
+	sbi(PORTB, (1 << PB4));
 }
 
 void clear_region(word_t x1, word_t y1, word_t x2, word_t y2)
@@ -309,13 +292,13 @@ void set_pixel(uint8_t r, uint8_t g, uint8_t b)
 
 void draw_pixel(int x, int y)
 {
-	cbi(P_CS, B_CS);
+	cbi(PORTB, (1 << PB4));
 
 	setXY(x, y, x, y);
 
 	set_pixel(g_fcolor_red, g_fcolor_green, g_fcolor_blue);
 
-	sbi(P_CS, B_CS);
+	sbi(PORTB, (1 << PB4));
 
 	resetXY();
 }
@@ -360,7 +343,7 @@ void print_char(uint8_t c, int x, int y)
 	word_t j, k;
 	word_t temp;
 
-	cbi(P_CS, B_CS);
+	cbi(PORTB, (1 << PB4));
 
 	if (g_disp_orient == PORTRAIT) {
 		setXY(x, y, x + g_font.x_size - 1, y + g_font.y_size - 1);
@@ -406,7 +389,7 @@ void print_char(uint8_t c, int x, int y)
 		}
 	}
 
-	sbi(P_CS, B_CS);
+	sbi(PORTB, (1 << PB4));
 	resetXY();
 }
 
@@ -453,7 +436,7 @@ void draw_straight_line(int x, int y, int l, int type)
 	ch = ((g_fcolor_red & 248) | g_fcolor_green >> 5);
 	cl = ((g_fcolor_green & 28) << 3 | g_fcolor_blue >> 3);
 
-	cbi(P_CS, B_CS);
+	cbi(PORTB, (1 << PB4));
 
 	if (type == HORIZONTAL_LINE) {
 		limit = l + 1;
@@ -466,7 +449,7 @@ void draw_straight_line(int x, int y, int l, int type)
 	for (i = 0; i < limit; i++)
 		LCD_Write_DATA_hl(ch, cl);
 
-	sbi(P_CS, B_CS);
+	sbi(PORTB, (1 << PB4));
 	resetXY();
 }
 
@@ -542,7 +525,7 @@ void draw_empty_circle(int x, int y, int radius)
 	ch = ((g_fcolor_red & 248) | g_fcolor_green >> 5);
 	cl = ((g_fcolor_green & 28) << 3 | g_fcolor_blue >> 3);
 
-	cbi(P_CS, B_CS);
+	cbi(PORTB, (1 << PB4));
 	setXY(x, y + radius, x, y + radius);
 	LCD_Write_DATA_hl(ch,cl);
 	setXY(x, y - radius, x, y - radius);
@@ -578,6 +561,29 @@ void draw_empty_circle(int x, int y, int radius)
 		setXY(x - y1, y - x1, x - y1, y - x1);
 		LCD_Write_DATA_hl(ch,cl);
 	}
-	sbi(P_CS, B_CS);
+	sbi(PORTB, (1 << PB4));
+	resetXY();
+}
+
+void draw_filled_circle(int x, int y, int radius)
+{
+	int x1, y1;
+
+	int r2 = radius * radius;
+
+	cbi(PORTB, (1 << PB4));
+
+	for(y1 = -radius; y1 <= radius; y1++)
+		for(x1 = -radius; x1 <= radius; x1++)
+			if(x1 * x1 + y1 * y1 <= r2) {
+				setXY(x + x1, y + y1, x + x1, y + y1);
+
+				LCD_Write_DATA_hl(
+					((g_fcolor_red & 248) | g_fcolor_green >> 5),
+					((g_fcolor_green & 28) << 3 | g_fcolor_blue >> 3));
+			}
+
+	sbi(PORTB, (1 << PB4));
+
 	resetXY();
 }

@@ -6,11 +6,13 @@
 #define AVR_SPECIFIC_H_
 
 // clear bit
-#define cbi(reg, bitmask) *reg &= ~bitmask
+#define cbi(reg, bitmask) reg &= ~bitmask
 // set bit
-#define sbi(reg, bitmask) *reg |= bitmask
+#define sbi(reg, bitmask) reg |= bitmask
+
 #define pulse_high(reg, bitmask) sbi(reg, bitmask); cbi(reg, bitmask);
 #define pulse_low(reg, bitmask) cbi(reg, bitmask); sbi(reg, bitmask);
+
 
 #define sport(port, data) port |= data
 #define cport(port, data) port &= data

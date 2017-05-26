@@ -50,10 +50,6 @@ uint8_t g_fcolor_red, g_fcolor_green, g_fcolor_blue;
 // background color
 uint8_t g_bcolor_red, g_bcolor_green, g_bcolor_blue;
 
-// register types and sizes
-regtype *P_WR, *P_CS, *P_RST, *P_SDA, *P_SCL;
-regsize B_WR, B_CS, B_RST, B_SDA, B_SCL;
-
 // currently selected font
 font_t g_font;
 
@@ -105,5 +101,6 @@ void draw_empty_rectangle(int x1, int y1, int x2, int y2);
 void draw_filled_rectangle(int x1, int y1, int x2, int y2);
 void draw_empty_round_rectangle(int x1, int y1, int x2, int y2);
 void draw_empty_circle(int x, int y, int radius);
+void draw_filled_circle(int x, int y, int radius);
 
 #endif

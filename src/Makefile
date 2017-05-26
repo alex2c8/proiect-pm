@@ -18,7 +18,7 @@ all: main.hex
 	$(CC) -c $(PLATFORM) $(DEFINES) $(CFLAGS) -o  $@  $<
 
 main.elf: $(OBJS)
-	$(CC) $(PLATFORM) -o $@ $^
+	$(CC) $(PLATFORM) -o $@ $^ -lm
 
 main.hex: main.elf
 	avr-objcopy -j .text -j .data -O ihex $^ $@
