@@ -44,7 +44,7 @@ int remaining_blocks;
 uint8_t **level_bitmap;
 
 // static functions
-static void get_accelerometer_data(void);
+static void interpret_accelerometer_data(void);
 
 static void reset_player(void)
 {
@@ -173,8 +173,11 @@ uint8_t loop_level(int level)
 }
 
 
-
-static void get_accelerometer_data(void)
+/**
+ * get data from accelerometer, interpret it
+ * and update paddle position accordingly
+ */
+static void interpret_accelerometer_data(void)
 {
 	double x = 0, y = 0, z = 0;
 	double gxds = 0, gyds = 0, gzds = 0;
@@ -233,8 +236,7 @@ void handle_paddle(void)
 	int old_x = g_paddle.base_x;
 	int old_y = g_paddle.base_y;
 
-	// TODO
-	get_accelerometer_data();
+	interpret_accelerometer_data();
 
 
 	// clear old paddle
