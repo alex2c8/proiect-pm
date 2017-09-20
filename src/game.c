@@ -4,6 +4,7 @@
 
 char g_buffer[BUF_MAX_LEN];
 
+const uint16_t MAXBALLSPEED = 7;
 
 const uint16_t level_pattern[5] = {
 	0xAAAA, // level 1 (odd bits)
@@ -64,10 +65,10 @@ static void reset_paddle(void)
 static void reset_ball(void)
 {
 	g_ball.radius = 4;
-	g_ball.speed_x = 5;
-	g_ball.speed_y = 5;
+	g_ball.speed_x = 0;
+	g_ball.speed_y = MAXBALLSPEED;
 	g_ball.center_x = g_paddle.base_x + g_paddle.width / 2;
-	g_ball.center_y = g_paddle.base_y - 4 - g_ball.radius / 2;
+	g_ball.center_y = g_paddle.base_y - 20 - g_ball.radius / 2;
 }
 
 static void clear_paddle_area(void)
@@ -260,17 +261,15 @@ void handle_paddle(void)
 }
 
 
-
-static int ball_paddle_delta(void)
+// TODO
+static int ball_hit_paddle(void)
 {
-	bool_t in_right = g_ball.center_x >= g_paddle.base_x;
-	bool_t in_left = g_ball.center_x <= g_paddle.base_x + g_paddle.width;
+	float dx = 1.0f * (g_ball.center_x - g_paddle.base_x);
+	bool_t on_x = (0 <= dx) && (dx <= g_paddle.width);
 
-	if (in_right && in_left &&
-		(g_ball.center_y + g_ball.radius >= g_paddle.base_y))
-		return 1;
+	bool_t on_y = g_ball.center_y + g_ball.radius >= g_paddle.base_y;
 
-	return 0;
+	return (on_x && on_y);
 }
 
 static int ball_hit_margins(void)
@@ -368,7 +367,9 @@ void handle_ball(void)
 	int old_x = g_ball.center_x;
 	int old_y = g_ball.center_y;
 
-	float delta;
+	float alpha;
+	float normal_x, rix, nrix;
+	float w_2;
 
 
 	// update ball's position
@@ -377,10 +378,18 @@ void handle_ball(void)
 
 
 	// check collision with paddle
-	delta = ball_paddle_delta();
-	if (delta) {
-		// TODO: fix this
-		g_ball.speed_y *= -1;
+	if (ball_hit_paddle()) {
+		w_2 = 0.5f * g_paddle.width;
+		normal_x =  g_paddle.base_x + w_2;
+		rix = g_ball.center_x - normal_x;
+		nrix = rix / w_2;
+
+		// get deflection angle
+		alpha = 1.0f * nrix;
+
+		// change speeds accordingly
+		g_ball.speed_x = 1.0f * MAXBALLSPEED * sin(alpha);
+		g_ball.speed_y = -1.0f * MAXBALLSPEED * cos(alpha);
 	}
 
 

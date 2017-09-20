@@ -41,7 +41,7 @@
 typedef struct {
 	uint8_t center_x, center_y;
 	uint8_t radius;
-	uint8_t speed_x, speed_y;
+	float speed_x, speed_y;
 } ball_t;
 
 typedef struct {
