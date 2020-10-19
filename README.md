@@ -1,3 +1,3 @@
-# atmega-dxball
+# ATmega DX-Ball
 
-[wiki](http://cs.curs.pub.ro/wiki/pm/prj2017/ddragomir/dx_ball)
+[DX-Ball](https://en.wikipedia.org/wiki/DX-Ball) on ATmega324A µC ([wiki](https://ocw.cs.pub.ro/courses/pm/prj2017/ddragomir/dx_ball)).
